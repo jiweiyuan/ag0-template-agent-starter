@@ -27,7 +27,6 @@ import {
   setupLogging,
   syncLogger,
 } from "./server/lib/logger.ts";
-import { buildBadgeScript } from "./server/lib/badge.ts";
 
 /** Resolve path relative to this file's directory */
 const resolve = (path: string) => new URL(path, import.meta.url).pathname;
@@ -343,14 +342,7 @@ async function main(): Promise<void> {
     // Use absolute path resolved from main.ts location
     const distPath = resolve("./frontend/dist");
     const indexPath = `${distPath}/index.html`;
-    let indexHtml = await Deno.readTextFile(indexPath);
-
-    // Inject badge into index.html on disk so serveStatic serves it too
-    if (Deno.env.get("SHOW_BADGE") === "true") {
-      const badgeTag = `<script>${buildBadgeScript()}</script>`;
-      indexHtml = indexHtml.replace("</body>", badgeTag + "\n</body>");
-      await Deno.writeTextFile(indexPath, indexHtml);
-    }
+    const indexHtml = await Deno.readTextFile(indexPath);
 
     app.use("/*", serveStatic({ root: distPath }));
     app.get("*", (c) => c.html(indexHtml));

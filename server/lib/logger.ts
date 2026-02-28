@@ -7,17 +7,18 @@ import {
 } from "@logtape/logtape";
 import { getFileSink } from "@logtape/file";
 import { join } from "@std/path";
-import { alertTrackerSink } from "./alert-tracker.ts";
 
-const LOG_DIR = "/workspace/logs";
+const LOG_DIR = Deno.env.get("LOG_DIR") ?? "logs";
 const AGENT_LOG_FILE = join(LOG_DIR, "agent.jsonl");
 
 export async function setupLogging(): Promise<void> {
+  // Ensure log directory exists
+  await Deno.mkdir(LOG_DIR, { recursive: true }).catch(() => {});
+
   await configure({
     sinks: {
       console: getConsoleSink(),
       file: getFileSink(AGENT_LOG_FILE, { formatter: jsonLinesFormatter }),
-      alerts: alertTrackerSink,
     },
     loggers: [
       {
@@ -27,7 +28,7 @@ export async function setupLogging(): Promise<void> {
       },
       {
         category: ["agent"],
-        sinks: ["console", "file", "alerts"],
+        sinks: ["console", "file"],
         lowestLevel: "debug",
       },
     ],
