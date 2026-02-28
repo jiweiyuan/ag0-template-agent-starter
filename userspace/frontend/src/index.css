@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   Layout CSS Variables
+   ============================================================================
+   Single source of truth for sidebar dimensions. Change these values to adjust
+   the sidebar width throughout the application.
+*/
+:root {
+  --sidebar-width: 16rem; /* 256px = w-64 in Tailwind */
+}
+
+/* ============================================================================
+   App Layout with Sidebar
+   ============================================================================
+   Uses CSS variables for consistent sidebar/content coordination.
+   The main-content transitions its margin when sidebar opens/closes.
+*/
+.app-layout {
+  @apply h-screen flex bg-gray-50 overflow-hidden;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+}
+
+.main-content {
+  @apply flex-1 flex flex-col h-full overflow-hidden;
+  @apply transition-[margin-left] duration-200 ease-in-out;
+  margin-left: 0;
+}
+
+/* On large screens, offset main content when sidebar is open */
+@media (min-width: 1024px) {
+  .main-content.sidebar-open {
+    margin-left: var(--sidebar-width);
+  }
+}
+
+/* Streamdown code block styles */
+[data-streamdown="code-block"] {
+  @apply rounded-lg border border-gray-200 bg-gray-50 overflow-hidden my-3;
+}
+
+[data-streamdown="code-block-header"] {
+  @apply flex items-center justify-between px-3 py-2 bg-gray-100 border-b border-gray-200 text-xs text-gray-600;
+}
+
+[data-streamdown="code-block-body"] {
+  @apply p-3 overflow-x-auto;
+}
+
+[data-streamdown="code-block-body"] pre {
+  @apply m-0 bg-transparent;
+}
+
+[data-streamdown="code-block-body"] code {
+  @apply text-sm font-mono leading-relaxed;
+}
+
+/* Code block action buttons */
+[data-streamdown="code-block-header"] button {
+  @apply p-1 rounded hover:bg-gray-200 transition-colors text-gray-500 hover:text-gray-700;
+}
+
+[data-streamdown="code-block-header"] button svg {
+  @apply w-4 h-4;
+}
