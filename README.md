@@ -16,23 +16,26 @@ ag0-template-agent-starter/
 ├── main.ts                    # Backend entry point (Deno + Hono)
 ├── deno.json                  # Deno workspace config
 ├── Dockerfile                 # Production Docker build
-├── server/                    # Backend infrastructure (do not modify)
-│   ├── config/                # Model + agent config
-│   ├── db/                    # SQLite chat storage (Drizzle ORM)
+├── server/                    # Backend infrastructure
+│   ├── agent/                 # Agent definition — CUSTOMIZE HERE
+│   │   ├── mod.ts             # Agent setup (tools, model, config)
+│   │   ├── agent.json         # MCP server config
+│   │   └── tools/             # Custom tool implementations
+│   ├── config/                # Model + agent config loaders
+│   ├── db/                    # SQLite chat storage
 │   ├── routes/                # REST API routes
 │   ├── services/              # Agent manager, chat service, sync
 │   ├── lib/                   # Logger, utilities
-│   └── frontend-lib/          # Shared types + Vite base config
-└── userspace/                 # Your workspace — customize here
-    ├── agent/
-    │   ├── mod.ts             # Agent definition (main file to edit)
-    │   ├── agent.json         # MCP server config
-    │   └── tools/             # Custom tool implementations
-    └── frontend/              # React chat UI
-        ├── src/
-        │   ├── App.tsx        # Main chat component
-        │   └── components/    # Sidebar, ChatHeader, ToolCard, etc.
-        └── package.json
+│   └── frontend-lib/          # Shared types + Vite base config (ag0-core alias)
+└── frontend/                  # React chat UI
+    └── src/
+        ├── App.tsx            # Main layout + chat logic
+        ├── components/
+        │   ├── Sidebar.tsx    # Chat list sidebar
+        │   ├── ChatHeader.tsx # Header with rename
+        │   ├── Message.tsx    # Message content renderer
+        │   └── tool-cards/    # Per-tool visualizations (Bash, Read, Write, Edit…)
+        └── lib/utils.ts
 ```
 
 ## Quick Start
@@ -51,22 +54,22 @@ cp .env.example .env
 # Edit .env — set ANTHROPIC_API_KEY
 
 # 2. Install frontend dependencies
-cd userspace/frontend && bun install && cd ../..
+cd frontend && bun install && cd ..
 
 # 3. Start development (two terminals)
-deno run -A --watch=./userspace/agent/ main.ts   # Terminal 1: backend (port 8080)
-cd userspace/frontend && bun dev                  # Terminal 2: frontend (port 3000)
+deno run -A --watch=./server/agent/ main.ts   # Terminal 1: backend (port 8080)
+cd frontend && bun dev                         # Terminal 2: frontend (port 3000)
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to chat with your agent.
 
 ## Customizing the Agent
 
-Edit `userspace/agent/mod.ts`:
+Edit `server/agent/mod.ts`:
 
 ```typescript
 import { createZypherAgent, type Message } from "@zypher/agent";
-import { createModel } from "ag0-server/config/model.ts";
+import { createModel } from "ag0-server/config/model.ts"; // ag0-server/ → server/
 import { RunTerminalCmdTool } from "@zypher/agent/tools";
 // import { MyCustomTool } from "./tools/my_tool.ts";
 
@@ -87,10 +90,10 @@ export const userAgent = await createAgent();
 
 ### Adding Custom Tools
 
-Create a file in `userspace/agent/tools/` and import it in `mod.ts`:
+Create a file in `server/agent/tools/` and import it in `server/agent/mod.ts`:
 
 ```typescript
-// userspace/agent/tools/weather.ts
+// server/agent/tools/weather.ts
 import { defineTool } from "@zypher/agent";
 import { z } from "zod";
 
@@ -107,7 +110,7 @@ export const GetWeatherTool = defineTool({
 
 ### Adding MCP Servers
 
-Edit `userspace/agent/agent.json`:
+Edit `server/agent/agent.json`:
 
 ```json
 {

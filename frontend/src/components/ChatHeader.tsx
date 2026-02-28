@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import { PanelLeft } from "lucide-react";
 import { useChatStore } from "ag0-core/store";
+import { Button } from "./ui/button";
 
 interface ChatHeaderProps {
   onToggleSidebar: () => void;
@@ -35,36 +37,25 @@ export function ChatHeader({ onToggleSidebar, sidebarOpen }: ChatHeaderProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleRename();
-    } else if (e.key === "Escape") {
+    if (e.key === "Enter") handleRename();
+    else if (e.key === "Escape") {
       setEditTitle(activeChat?.title ?? "");
       setIsEditing(false);
     }
   };
 
   return (
-    <header className="bg-white border-b px-4 py-3 flex items-center gap-3">
-      {/* Menu button - shown when sidebar is closed */}
-      <button
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 shrink-0">
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={onToggleSidebar}
-        className={`p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors ${sidebarOpen ? "lg:hidden" : ""}`}
-        title="Open sidebar"
+        className={`h-8 w-8 text-gray-600 ${sidebarOpen ? "lg:hidden" : ""}`}
+        title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
       >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          {/* Sidebar panel icon with right arrow (expand) */}
-          <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth={2} />
-          <line x1="9" y1="3" x2="9" y2="21" strokeWidth={2} />
-          <polyline points="13,9 16,12 13,15" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+        <PanelLeft size={18} />
+      </Button>
 
-      {/* Title */}
       <div className="flex-1 min-w-0">
         {activeChatId && activeChat ? (
           isEditing ? (
@@ -75,20 +66,19 @@ export function ChatHeader({ onToggleSidebar, sidebarOpen }: ChatHeaderProps) {
               onChange={(e) => setEditTitle(e.target.value)}
               onBlur={handleRename}
               onKeyDown={handleKeyDown}
-              aria-label="Chat title"
-              className="w-full max-w-md px-2 py-1 text-lg font-semibold text-gray-900 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              className="w-full max-w-md px-2 py-1 text-base font-semibold text-gray-900 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             />
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="text-lg font-semibold text-gray-900 hover:text-blue-600 truncate max-w-md block"
+              className="text-base font-semibold text-gray-900 hover:text-blue-600 truncate max-w-md block"
               title="Click to rename"
             >
               {activeChat.title}
             </button>
           )
         ) : (
-          <h1 className="text-lg font-semibold text-gray-900">New Chat</h1>
+          <h1 className="text-base font-semibold text-gray-900">New Chat</h1>
         )}
       </div>
     </header>

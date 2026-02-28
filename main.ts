@@ -75,9 +75,9 @@ async function main(): Promise<void> {
   const db = initDb(dbPath);
   const chatService = new ChatService(db);
 
-  // Load userspace agent — errors here are agent code issues, alert Agent0
-  const configPath = resolve("./userspace/agent/agent.json");
-  const mod = await import("./userspace/agent/mod.ts");
+  // Load server agent — errors here are agent code issues, alert Agent0
+  const configPath = resolve("./server/agent/agent.json");
+  const mod = await import("./server/agent/mod.ts");
   const userAgent = mod.userAgent;
   const createAgent = mod.createAgent;
 
@@ -341,7 +341,7 @@ async function main(): Promise<void> {
   } else {
     // Production (default): serve static files from dist/
     // Use absolute path resolved from main.ts location
-    const distPath = resolve("./userspace/frontend/dist");
+    const distPath = resolve("./frontend/dist");
     const indexPath = `${distPath}/index.html`;
     let indexHtml = await Deno.readTextFile(indexPath);
 
